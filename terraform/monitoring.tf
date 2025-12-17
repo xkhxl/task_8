@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_metric_alarm" "ecs_high_cpu" {
-  alarm_name          = "strapi-high-cpu"
+  alarm_name          = "akhil-strapi-high-cpu"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 2
   metric_name         = "CPUUtilization"
@@ -17,7 +17,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_high_cpu" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "ecs_high_memory" {
-  alarm_name          = "strapi-high-memory"
+  alarm_name          = "akhil-strapi-high-memory"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 2
   metric_name         = "MemoryUtilization"

@@ -1,4 +1,4 @@
 resource "aws_cloudwatch_log_group" "strapi" {
-  name              = "/ecs/strapi-log-group"
+  name              = "/ecs/akhil-strapi-log-group"
   retention_in_days = 7
 }
