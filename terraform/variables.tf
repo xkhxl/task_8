@@ -19,3 +19,27 @@ variable "subnets" {
 variable "security_group_id" {
   type = string
 }
+
+variable "admin_jwt_secret" {
+  type = string
+}
+
+variable "jwt_secret" {
+  type = string
+}
+
+variable "app_keys" {
+  type = string
+}
+
+variable "api_token_salt" {
+  type = string
+}
+
+variable "transfer_token_salt" {
+  type = string
+}
+
+variable "encryption_key" {
+  type = string
+}

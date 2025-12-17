@@ -10,11 +10,11 @@ terraform {
 }
 
 provider "aws" {
-  region = var.aws_region # AWS region to deploy resources
+  region = var.aws_region
 }
 
 resource "aws_ecs_cluster" "strapi" {
-  name = "akhil-strapi-ecs" # ECS cluster for Strapi
+  name = "akhil-strapi-ecs"
 }
 
 resource "aws_ecs_task_definition" "strapi" {
@@ -39,6 +39,17 @@ resource "aws_ecs_task_definition" "strapi" {
         }
       ]
 
+      environment = [
+        { name = "NODE_ENV", value = "production" },
+
+        { name = "ADMIN_JWT_SECRET", value = var.admin_jwt_secret },
+        { name = "JWT_SECRET", value = var.jwt_secret },
+        { name = "APP_KEYS", value = var.app_keys },
+        { name = "API_TOKEN_SALT", value = var.api_token_salt },
+        { name = "TRANSFER_TOKEN_SALT", value = var.transfer_token_salt },
+        { name = "ENCRYPTION_KEY", value = var.encryption_key }
+      ]
+
       logConfiguration = {
         logDriver = "awslogs"
         options = {
@@ -51,8 +62,6 @@ resource "aws_ecs_task_definition" "strapi" {
   ])
 }
 
-
-
 resource "aws_ecs_service" "strapi" {
   name            = "strapi-service"
   cluster         = aws_ecs_cluster.strapi.id
@@ -60,11 +69,11 @@ resource "aws_ecs_service" "strapi" {
   desired_count   = 1
   launch_type     = "FARGATE"
 
-  force_new_deployment = true                 # Redeploy on updates
+  force_new_deployment = true
 
   network_configuration {
-    subnets          = var.subnets             # VPC subnets
-    security_groups  = [var.security_group_id] # Traffic control
-    assign_public_ip = true                    # Public access
+    subnets          = var.subnets
+    security_groups  = [var.security_group_id]
+    assign_public_ip = true
   }
 }
