@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_dashboard" "ecs_dashboard" {
-  dashboard_name = "strapi-ecs-dashboard"
+  dashboard_name = "akhil-strapi-ecs-dashboard"
 
   dashboard_body = jsonencode({
     widgets = [
