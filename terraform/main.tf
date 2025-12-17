@@ -14,7 +14,7 @@ provider "aws" {
 }
 
 resource "aws_ecs_cluster" "strapi" {
-  name = "strapi-cluster" # ECS cluster for Strapi
+  name = "strapi-ecs-cluster" # ECS cluster for Strapi
 }
 
 resource "aws_ecs_task_definition" "strapi" {
