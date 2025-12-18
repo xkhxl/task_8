@@ -14,7 +14,11 @@ variable "subnets" {
   type = list(string)
 }
 
-variable "security_group_id" {
+variable "alb_security_group_id" {
+  type = string
+}
+
+variable "ecs_security_group_id" {
   type = string
 }
 

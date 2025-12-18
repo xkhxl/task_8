@@ -4,7 +4,6 @@ on:
   workflow_dispatch:
     inputs:
       image_tag:
-        description: "Docker image tag to deploy"
         required: true
         default: "latest"
 

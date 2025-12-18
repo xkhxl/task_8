@@ -23,7 +23,7 @@ resource "aws_lb" "strapi" {
   name               = "strapi-alb"
   load_balancer_type = "application"
   subnets            = var.subnets
-  security_groups    = [var.security_group_id]
+  security_groups    = [var.alb_security_group_id]
 }
 
 # Target Group
@@ -35,12 +35,8 @@ resource "aws_lb_target_group" "strapi" {
   vpc_id      = var.vpc_id
 
   health_check {
-    path                = "/"
-    matcher             = "200-399"
-    interval            = 30
-    timeout             = 5
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
+    path    = "/"
+    matcher = "200-399"
   }
 }
 
@@ -75,7 +71,6 @@ resource "aws_ecs_task_definition" "strapi" {
       portMappings = [
         {
           containerPort = 1337
-          protocol      = "tcp"
         }
       ]
 
@@ -101,7 +96,7 @@ resource "aws_ecs_task_definition" "strapi" {
   ])
 }
 
-# ECS Service (ATTACHED TO ALB)
+# ECS Service
 resource "aws_ecs_service" "strapi" {
   name            = "strapi-service"
   cluster         = aws_ecs_cluster.strapi.id
@@ -109,11 +104,9 @@ resource "aws_ecs_service" "strapi" {
   desired_count   = 1
   launch_type     = "FARGATE"
 
-  force_new_deployment = true
-
   network_configuration {
     subnets         = var.subnets
-    security_groups = [var.security_group_id]
+    security_groups = [var.ecs_security_group_id]
     assign_public_ip = false
   }
 
