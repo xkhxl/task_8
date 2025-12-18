@@ -18,12 +18,6 @@ resource "aws_ecs_cluster" "strapi" {
   name = "akhil-strapi-ecs"
 }
 
-# CloudWatch Log Group
-resource "aws_cloudwatch_log_group" "strapi" {
-  name              = "/ecs/strapi"
-  retention_in_days = 7
-}
-
 # ALB
 resource "aws_lb" "strapi" {
   name               = "strapi-alb"
