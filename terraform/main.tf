@@ -87,6 +87,8 @@ resource "aws_ecs_task_definition" "strapi" {
         { name = "NODE_ENV", value = "production" },
         { name = "DATABASE_CLIENT", value = "sqlite" },
         { name = "DATABASE_FILENAME", value = "/tmp/data.db" },
+        { name = "DATABASE_SSL", value = "false" },
+        { name = "DATABASE_URL", value = "" },
         { name = "ADMIN_JWT_SECRET", value = var.admin_jwt_secret },
         { name = "JWT_SECRET", value = var.jwt_secret },
         { name = "APP_KEYS", value = var.app_keys },
