@@ -34,11 +34,11 @@ resource "aws_lb_target_group" "strapi" {
   vpc_id      = var.vpc_id
 
   health_check {
-    path                = "/admin"
+    path                = "/"
     matcher             = "200-399"
     interval            = 30
     timeout             = 5
-    healthy_threshold   = 2
+    healthy_threshold   = 5
     unhealthy_threshold = 2
   }
 }
@@ -85,6 +85,8 @@ resource "aws_ecs_task_definition" "strapi" {
 
       environment = [
         { name = "NODE_ENV", value = "production" },
+        { name = "DATABASE_CLIENT", value = "sqlite" },
+        { name = "DATABASE_FILENAME", value = "/tmp/data.db" },
         { name = "ADMIN_JWT_SECRET", value = var.admin_jwt_secret },
         { name = "JWT_SECRET", value = var.jwt_secret },
         { name = "APP_KEYS", value = var.app_keys },
