@@ -18,38 +18,10 @@ resource "aws_ecs_cluster" "strapi" {
   name = "akhil-strapi-ecs"
 }
 
-# ALB
-resource "aws_lb" "strapi" {
-  name               = "akhil-strapi-alb"
-  load_balancer_type = "application"
-  subnets            = var.subnets
-  security_groups    = [var.alb_security_group_id]
-}
-
-# Target Group
-resource "aws_lb_target_group" "strapi" {
-  name        = "akhil-strapi-tg"
-  port        = 1337
-  protocol    = "HTTP"
-  target_type = "ip"
-  vpc_id      = var.vpc_id
-
-  health_check {
-    path    = "/"
-    matcher = "200-399"
-  }
-}
-
-# Listener
-resource "aws_lb_listener" "http" {
-  load_balancer_arn = aws_lb.strapi.arn
-  port              = 80
-  protocol          = "HTTP"
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.strapi.arn
-  }
+# CloudWatch Log Group
+resource "aws_cloudwatch_log_group" "strapi" {
+  name              = "/ecs/akhil-strapi-log-group"
+  retention_in_days = 7
 }
 
 # Task Definition
@@ -71,6 +43,7 @@ resource "aws_ecs_task_definition" "strapi" {
       portMappings = [
         {
           containerPort = 1337
+          protocol      = "tcp"
         }
       ]
 
@@ -96,7 +69,7 @@ resource "aws_ecs_task_definition" "strapi" {
   ])
 }
 
-# ECS Service
+# ECS Service (ALB is external)
 resource "aws_ecs_service" "strapi" {
   name            = "strapi-service"
   cluster         = aws_ecs_cluster.strapi.id
@@ -111,10 +84,8 @@ resource "aws_ecs_service" "strapi" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.strapi.arn
+    target_group_arn = var.target_group_arn
     container_name   = "strapi"
     container_port   = 1337
   }
-
-  depends_on = [aws_lb_listener.http]
 }
