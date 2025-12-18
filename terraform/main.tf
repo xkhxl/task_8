@@ -20,7 +20,7 @@ resource "aws_ecs_cluster" "strapi" {
 
 # ALB
 resource "aws_lb" "strapi" {
-  name               = "strapi-alb"
+  name               = "akhil-strapi-alb"
   load_balancer_type = "application"
   subnets            = var.subnets
   security_groups    = [var.alb_security_group_id]
@@ -28,7 +28,7 @@ resource "aws_lb" "strapi" {
 
 # Target Group
 resource "aws_lb_target_group" "strapi" {
-  name        = "strapi-tg"
+  name        = "akhil-strapi-tg"
   port        = 1337
   protocol    = "HTTP"
   target_type = "ip"
