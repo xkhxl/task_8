@@ -9,7 +9,7 @@ on:
         default: "latest"
 
 env:
-  AWS_REGION: us-east-1
+  AWS_REGION: ap-south-1
   ECR_REPOSITORY: strapi
   AWS_ACCOUNT_ID: 301782007642
 
@@ -18,18 +18,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      - uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Init
         working-directory: terraform
@@ -42,7 +39,9 @@ jobs:
             -var="image_uri=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${{ github.event.inputs.image_tag }}" \
             -var="execution_role_arn=arn:aws:iam::${AWS_ACCOUNT_ID}:role/ecsTaskExecutionRole" \
             -var='subnets=${{ secrets.ECS_SUBNETS }}' \
-            -var="security_group_id=${{ secrets.ECS_SECURITY_GROUP }}" \
+            -var="vpc_id=${{ secrets.VPC_ID }}" \
+            -var="alb_security_group_id=${{ secrets.ALB_SECURITY_GROUP }}" \
+            -var="ecs_security_group_id=${{ secrets.ECS_SECURITY_GROUP }}" \
             -var="admin_jwt_secret=${{ secrets.ADMIN_JWT_SECRET }}" \
             -var="jwt_secret=${{ secrets.JWT_SECRET }}" \
             -var="app_keys=${{ secrets.APP_KEYS }}" \

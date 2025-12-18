@@ -3,13 +3,11 @@ variable "aws_region" {
 }
 
 variable "image_uri" {
-  description = "ECR image URI"
-  type        = string
+  type = string
 }
 
 variable "execution_role_arn" {
-  description = "Existing ECS execution role ARN"
-  type        = string
+  type = string
 }
 
 variable "subnets" {
@@ -17,6 +15,10 @@ variable "subnets" {
 }
 
 variable "security_group_id" {
+  type = string
+}
+
+variable "vpc_id" {
   type = string
 }
 

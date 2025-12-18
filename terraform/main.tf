@@ -13,10 +13,56 @@ provider "aws" {
   region = var.aws_region
 }
 
+# ECS Cluster
 resource "aws_ecs_cluster" "strapi" {
   name = "akhil-strapi-ecs"
 }
 
+# CloudWatch Log Group
+resource "aws_cloudwatch_log_group" "strapi" {
+  name              = "/ecs/strapi"
+  retention_in_days = 7
+}
+
+# ALB
+resource "aws_lb" "strapi" {
+  name               = "strapi-alb"
+  load_balancer_type = "application"
+  subnets            = var.subnets
+  security_groups    = [var.security_group_id]
+}
+
+# Target Group
+resource "aws_lb_target_group" "strapi" {
+  name        = "strapi-tg"
+  port        = 1337
+  protocol    = "HTTP"
+  target_type = "ip"
+  vpc_id      = var.vpc_id
+
+  health_check {
+    path                = "/"
+    matcher             = "200-399"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
+}
+
+# Listener
+resource "aws_lb_listener" "http" {
+  load_balancer_arn = aws_lb.strapi.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.strapi.arn
+  }
+}
+
+# Task Definition
 resource "aws_ecs_task_definition" "strapi" {
   family                   = "strapi-task"
   network_mode             = "awsvpc"
@@ -41,7 +87,6 @@ resource "aws_ecs_task_definition" "strapi" {
 
       environment = [
         { name = "NODE_ENV", value = "production" },
-
         { name = "ADMIN_JWT_SECRET", value = var.admin_jwt_secret },
         { name = "JWT_SECRET", value = var.jwt_secret },
         { name = "APP_KEYS", value = var.app_keys },
@@ -62,6 +107,7 @@ resource "aws_ecs_task_definition" "strapi" {
   ])
 }
 
+# ECS Service (ATTACHED TO ALB)
 resource "aws_ecs_service" "strapi" {
   name            = "strapi-service"
   cluster         = aws_ecs_cluster.strapi.id
@@ -72,8 +118,16 @@ resource "aws_ecs_service" "strapi" {
   force_new_deployment = true
 
   network_configuration {
-    subnets          = var.subnets
-    security_groups  = [var.security_group_id]
-    assign_public_ip = true
+    subnets         = var.subnets
+    security_groups = [var.security_group_id]
+    assign_public_ip = false
   }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.strapi.arn
+    container_name   = "strapi"
+    container_port   = 1337
+  }
+
+  depends_on = [aws_lb_listener.http]
 }
