@@ -63,7 +63,7 @@ resource "aws_cloudwatch_log_group" "strapi" {
 
 # Task Definition
 resource "aws_ecs_task_definition" "strapi" {
-  family                   = "strapi-task"
+  family                   = "akhil-strapi-task"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
   cpu                      = "512"
@@ -116,7 +116,7 @@ resource "aws_ecs_service" "strapi" {
   network_configuration {
     subnets         = var.subnets
     security_groups = [var.ecs_security_group_id]
-    assign_public_ip = false
+    assign_public_ip = true
   }
 
   load_balancer {
