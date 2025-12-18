@@ -34,7 +34,7 @@ resource "aws_lb_target_group" "strapi" {
   vpc_id      = var.vpc_id
 
   health_check {
-    path                = "/"
+    path                = "/admin"
     matcher             = "200-399"
     interval            = 30
     timeout             = 5
