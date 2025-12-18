@@ -1,6 +1,5 @@
 terraform {
   required_version = ">= 1.0"
-
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -18,9 +17,47 @@ resource "aws_ecs_cluster" "strapi" {
   name = "akhil-strapi-ecs"
 }
 
+# ALB
+resource "aws_lb" "strapi" {
+  name               = "akhil-strapi-alb"
+  load_balancer_type = "application"
+  subnets            = var.subnets
+  security_groups    = [var.alb_security_group_id]
+}
+
+# Target Group (PORT 1337)
+resource "aws_lb_target_group" "strapi" {
+  name        = "akhil-strapi-tg"
+  port        = 1337
+  protocol    = "HTTP"
+  target_type = "ip"
+  vpc_id      = var.vpc_id
+
+  health_check {
+    path                = "/"
+    matcher             = "200-399"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
+}
+
+# Listener
+resource "aws_lb_listener" "http" {
+  load_balancer_arn = aws_lb.strapi.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.strapi.arn
+  }
+}
+
 # CloudWatch Log Group
 resource "aws_cloudwatch_log_group" "strapi" {
-  name              = "/ecs/akhil-strapi-log-group"
+  name              = "/ecs/akhil-strapi"
   retention_in_days = 7
 }
 
@@ -43,7 +80,6 @@ resource "aws_ecs_task_definition" "strapi" {
       portMappings = [
         {
           containerPort = 1337
-          protocol      = "tcp"
         }
       ]
 
@@ -62,14 +98,14 @@ resource "aws_ecs_task_definition" "strapi" {
         options = {
           awslogs-group         = aws_cloudwatch_log_group.strapi.name
           awslogs-region        = var.aws_region
-          awslogs-stream-prefix = "ecs/strapi"
+          awslogs-stream-prefix = "ecs"
         }
       }
     }
   ])
 }
 
-# ECS Service (ALB is external)
+# ECS Service
 resource "aws_ecs_service" "strapi" {
   name            = "strapi-service"
   cluster         = aws_ecs_cluster.strapi.id
@@ -84,8 +120,10 @@ resource "aws_ecs_service" "strapi" {
   }
 
   load_balancer {
-    target_group_arn = var.target_group_arn
+    target_group_arn = aws_lb_target_group.strapi.arn
     container_name   = "strapi"
     container_port   = 1337
   }
+
+  depends_on = [aws_lb_listener.http]
 }

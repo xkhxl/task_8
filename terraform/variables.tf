@@ -10,15 +10,19 @@ variable "execution_role_arn" {
   type = string
 }
 
+variable "vpc_id" {
+  type = string
+}
+
 variable "subnets" {
   type = list(string)
 }
 
-variable "ecs_security_group_id" {
+variable "alb_security_group_id" {
   type = string
 }
 
-variable "target_group_arn" {
+variable "ecs_security_group_id" {
   type = string
 }
 

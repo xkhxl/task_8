@@ -37,9 +37,10 @@ jobs:
           terraform apply -auto-approve \
             -var="image_uri=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${{ github.event.inputs.image_tag }}" \
             -var="execution_role_arn=arn:aws:iam::${AWS_ACCOUNT_ID}:role/ecsTaskExecutionRole" \
+            -var="vpc_id=${{ secrets.VPC_ID }}" \
             -var='subnets=${{ secrets.ECS_SUBNETS }}' \
+            -var="alb_security_group_id=${{ secrets.ALB_SECURITY_GROUP }}" \
             -var="ecs_security_group_id=${{ secrets.ECS_SECURITY_GROUP }}" \
-            -var="target_group_arn=${{ secrets.TARGET_GROUP_ARN }}" \
             -var="admin_jwt_secret=${{ secrets.ADMIN_JWT_SECRET }}" \
             -var="jwt_secret=${{ secrets.JWT_SECRET }}" \
             -var="app_keys=${{ secrets.APP_KEYS }}" \

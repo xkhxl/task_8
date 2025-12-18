@@ -1,4 +1,4 @@
-resource "aws_cloudwatch_metric_alarm" "ecs_high_cpu" {
+resource "aws_cloudwatch_metric_alarm" "cpu_high" {
   alarm_name          = "akhil-strapi-high-cpu"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 2
@@ -12,11 +12,9 @@ resource "aws_cloudwatch_metric_alarm" "ecs_high_cpu" {
     ClusterName = aws_ecs_cluster.strapi.name
     ServiceName = aws_ecs_service.strapi.name
   }
-
-  alarm_description = "High CPU usage detected for Strapi ECS service"
 }
 
-resource "aws_cloudwatch_metric_alarm" "ecs_high_memory" {
+resource "aws_cloudwatch_metric_alarm" "memory_high" {
   alarm_name          = "akhil-strapi-high-memory"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 2
@@ -30,6 +28,4 @@ resource "aws_cloudwatch_metric_alarm" "ecs_high_memory" {
     ClusterName = aws_ecs_cluster.strapi.name
     ServiceName = aws_ecs_service.strapi.name
   }
-
-  alarm_description = "High Memory usage detected for Strapi ECS service"
 }
