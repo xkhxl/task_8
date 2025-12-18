@@ -6,10 +6,10 @@ output "ecs_service_name" {
   value = aws_ecs_service.strapi.name
 }
 
-output "alb_dns_name" {
-  value = aws_lb.strapi.dns_name
+output "ecs_task_definition" {
+  value = aws_ecs_task_definition.strapi.arn
 }
 
-output "cloudwatch_log_group" {
-  value = aws_cloudwatch_log_group.strapi.name
+output "container_image" {
+  value = var.image_uri
 }
